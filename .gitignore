@@ -1,0 +1,192 @@
+# ===================================
+# Community Hub Git Ignore
+# ===================================
+
+# ===================================
+# 环境变量和敏感配置
+# ===================================
+# 环境变量文件（包含密码）
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+.env.staging
+
+# 服务配置文件（包含敏感信息）
+bbs/bbs-go.yaml
+bbs/bbs-go.prod.yaml
+bbs/bbs-go.dev.yaml
+mihomo/config/config.yaml
+!mihomo/config/config.yaml.example
+
+# Nginx 配置中的敏感信息
+nginx/conf.d/*.conf
+!nginx/conf.d/*.conf.example
+
+# ===================================
+# 数据库和存储数据
+# ===================================
+# MySQL 数据文件
+mysql/data/
+mysql/*.sql
+mysql/backups/
+
+# MinIO 存储数据
+minio/data/
+
+# BBS-GO 上传文件
+bbs/uploads/
+
+# Homarr 数据
+homarr/configs/
+homarr/icons/
+homarr/data/
+
+# BookStack 数据
+bookstack/config/
+
+# MetaCubeX 数据
+clash/data/
+
+# ===================================
+# 日志文件
+# ===================================
+# Nginx 日志
+nginx/logs/*.log
+nginx/logs/**/*.log
+
+# 应用日志
+*.log
+*.log.*
+logs/
+**/*.log
+
+# ===================================
+# SSL 证书和密钥
+# ===================================
+nginx/ssl/*.key
+nginx/ssl/*.crt
+nginx/ssl/*.pem
+nginx/ssl/*.p12
+nginx/ssl/*.pfx
+*.key
+*.crt
+*.pem
+*.p12
+*.pfx
+
+# ===================================
+# 备份文件
+# ===================================
+*.backup
+*.bak
+*.old
+backups/
+backup-*.tar.gz
+*.tar.gz
+*.zip
+*.sql.gz
+
+# ===================================
+# 临时文件
+# ===================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===================================
+# IDE 和编辑器
+# ===================================
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.*.sw[a-z]
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ===================================
+# 操作系统
+# ===================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ===================================
+# Docker 相关
+# ===================================
+.docker/
+.docker-compose/
+docker-compose.override.yml
+
+# ===================================
+# Node.js (如果有前端开发)
+# ===================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ===================================
+# Python (如果有脚本)
+# ===================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# ===================================
+# 其他
+# ===================================
+# 测试文件
+test/
+tests/
+*.test
+*.spec
+
+# 构建产物
+dist/
+build/
+out/
