@@ -114,8 +114,13 @@ services:
   homepage:
     container_name: homepage
     image: ghcr.io/gethomepage/homepage:latest
+    environment:
+      - HOMEPAGE_ALLOWED_HOSTS=localhost,82.158.90.99,82.158.90.99:8081
     volumes:
       - ./homepage/config:/app/config
+      - ./homepage/logs:/logs
+      - ./homepage/icons:/app/public/icons
+      - ./homepage/images:/app/public/images
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - "${HOMEPAGE_PORT}:3000"
@@ -132,16 +137,21 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - APP_KEY=${BOOKSTACK_APP_KEY}
-      - APP_URL=http://bookstack.local
+      - APP_URL=http://82.158.90.99:8083
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_DATABASE=${MYSQL_BOOKSTACK_DATABASE}
       - DB_USERNAME=${MYSQL_BOOKSTACK_USER}
       - DB_PASSWORD=${MYSQL_BOOKSTACK_PASSWORD}
+      # 公开访问配置
+      - APP_PUBLIC=true
+      - APP_VIEWS_BOOKS=true
+      - APP_VIEWS_BOOKSHELVES=true
+      - APP_VIEWS_BOOKS_CHAPTER=true
     volumes:
       - ./bookstack/config:/config
     ports:
-      - "${BOOKSTACK_PORT}:80"
+      - "${BOOKSTACK_PORT}:8080"
     restart: unless-stopped
     networks:
       - community-net
