@@ -12,7 +12,7 @@ services:
     image: nginx:alpine
     depends_on:
       - bbsgo
-      - homarr
+      - homepage
       - bookstack
       - clash
       - vpn
@@ -111,19 +111,14 @@ services:
     networks:
       - community-net
 
-  homarr:
-    container_name: homarr
-    image: ghcr.io/homarr-labs/homarr:latest
-    depends_on:
-      - mysql
-    environment:
-      - DATABASE_URL=mysql://${MYSQL_HOMARR_USER}:${MYSQL_HOMARR_PASSWORD}@mysql:3306/${MYSQL_HOMARR_DATABASE}
+  homepage:
+    container_name: homepage
+    image: ghcr.io/gethomepage/homepage:latest
     volumes:
-      - ./homarr/configs:/app/data/configs
-      - ./homarr/icons:/app/public/icons
-      - ./homarr/data:/data
+      - ./homepage/config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
-      - "${HOMARR_PORT}:7575"
+      - "${HOMEPAGE_PORT}:3000"
     restart: unless-stopped
     networks:
       - community-net

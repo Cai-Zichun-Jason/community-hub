@@ -1,0 +1,14 @@
+---
+# Homepage 小部件配置
+
+- widget:
+    type: calendar
+    firstDayInWeek: monday
+    view: monthly
+    maxEvents: 10
+    showTime: true
+    integrations:
+      - type: ical
+        url: https://mail.slai.edu.cn/owa/calendar/62997ede6db04f3c8de2140ee3008bbd@slai.edu.cn/3374bb3b95a546399f19f2a66b6773d71543872373234047105/calendar.ics
+        name: SLAI 活动日历
+        color: blue
