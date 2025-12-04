@@ -2,14 +2,14 @@
 
 ## 📋 服务域名映射
 
-| 服务 | 内网域名 | 公网域名 | 直接访问端口 | 说明 |
-|------|----------|----------|-------------|------|
-| **Homarr** | portal.local | portal.slai-unofficial.online | 8081 | 导航门户 |
-| **BBS-GO** | bbs.local | bbs.slai-unofficial.online | 8082 | 论坛系统 |
-| **BookStack** | blog.local | blog.slai-unofficial.online | 8083 | 知识库/博客 |
-| **MinIO Console** | minio.local | minio.slai-unofficial.online | 9001 | 对象存储控制台 |
-| **MetaCubeX** | vpn.local | vpn.slai-unofficial.online | 9002 | 代理管理界面 |
-| **Mihomo** | proxy.local | proxy.slai-unofficial.online | 9023 | 代理核心 API |
+| 服务 | 内网域名 | 公网域名（示例） | 直接访问端口 | 说明 |
+|------|----------|-----------------|-------------|------|
+| **Homarr** | portal.local | portal.example.com | 8081 | 导航门户 |
+| **BBS-GO** | bbs.local | bbs.example.com | 8082 | 论坛系统 |
+| **BookStack** | blog.local | blog.example.com | 8083 | 知识库/博客 |
+| **MinIO Console** | minio.local | minio.example.com | 9001 | 对象存储控制台 |
+| **MetaCubeX** | clash.local | clash.example.com | 9002 | 代理管理界面 |
+| **Mihomo** | vpn.local | vpn.example.com | 9023 | 代理核心服务 |
 | **MySQL** | - | - | 9021 | 数据库 |
 | **MinIO API** | - | - | 9022 | S3 API |
 
@@ -24,10 +24,10 @@
 - VPN 管理: `http://vpn.local`
 
 **公网访问示例：**
-- 导航门户: `http://portal.slai-unofficial.online`
-- 论坛: `http://bbs.slai-unofficial.online`
-- 博客: `http://blog.slai-unofficial.online`
-- VPN 管理: `http://vpn.slai-unofficial.online`
+- 导航门户: `http://portal.example.com`
+- 论坛: `http://bbs.example.com`
+- 博客: `http://blog.example.com`
+- VPN 管理: `http://vpn.example.com`
 
 ### 方式 2: 直接访问端口（开发调试）
 
@@ -68,12 +68,12 @@ Mihomo 提供的代理服务端口：
 在 DNS 服务商配置以下 A 记录（全部指向你的公网 IP）：
 
 ```
-portal.slai-unofficial.online
-bbs.slai-unofficial.online
-blog.slai-unofficial.online
-minio.slai-unofficial.online
-vpn.slai-unofficial.online
-proxy.slai-unofficial.online
+portal.example.com
+bbs.example.com
+blog.example.com
+minio.example.com
+vpn.example.com
+proxy.example.com
 ```
 
 ## 🚀 服务说明
@@ -133,37 +133,37 @@ proxy.slai-unofficial.online
 ### 启动所有服务
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 启动特定服务
 
 ```bash
 # 仅启动 Homarr
-docker-compose up -d homarr
+docker compose up -d homarr
 
 # 仅启动论坛
-docker-compose up -d bbsgo
+docker compose up -d bbsgo
 
 # 仅启动博客
-docker-compose up -d bookstack
+docker compose up -d bookstack
 ```
 
 ### 查看服务状态
 
 ```bash
-docker-compose ps
+docker compose ps
 ```
 
 ### 查看服务日志
 
 ```bash
 # 查看所有日志
-docker-compose logs -f
+docker compose logs -f
 
 # 查看特定服务日志
-docker-compose logs -f homarr
-docker-compose logs -f bookstack
+docker compose logs -f homarr
+docker compose logs -f bookstack
 ```
 
 ## 🛡️ 安全建议

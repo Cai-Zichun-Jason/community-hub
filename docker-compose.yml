@@ -15,7 +15,7 @@ services:
       - homarr
       - bookstack
       - clash
-      - mihomo
+      - vpn
       - minio
     ports:
       - "80:80"
@@ -136,7 +136,7 @@ services:
         condition: service_healthy
     environment:
       - TZ=Asia/Shanghai
-      - APP_KEY=base64:YnnPfihZSNCQ9jYP6dZiFpIrBer2FFhHuAhTFqX++BI=
+      - APP_KEY=${BOOKSTACK_APP_KEY}
       - APP_URL=http://bookstack.local
       - DB_HOST=mysql
       - DB_PORT=3306
@@ -152,7 +152,7 @@ services:
       - community-net
 
   clash:
-    container_name: clash
+    container_name: community-clash
     image: ghcr.io/metacubex/metacubexd:latest
     volumes:
       - ./clash/data:/app/data
@@ -162,14 +162,13 @@ services:
     networks:
       - community-net
 
-  mihomo:
-    container_name: mihomo
+  vpn:
+    container_name: community-vpn
     image: metacubex/mihomo:latest
     volumes:
       - ./mihomo/config:/root/.config/mihomo
     ports:
-      - "${MIHOMO_PORT}:7890"  # HTTP/SOCKS5 混合端口对外暴露
-      # 9090 API 端口仅在 Docker 网络内部使用，不对外暴露
+      - "${VPN_PORT}:7890"  # HTTP/SOCKS5 混合端口对外暴露
     restart: unless-stopped
     networks:
       - community-net

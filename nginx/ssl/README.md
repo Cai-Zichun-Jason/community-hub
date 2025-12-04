@@ -76,5 +76,5 @@ For Let's Encrypt certificates, set up auto-renewal:
 sudo certbot renew --dry-run
 
 # Add to crontab for automatic renewal
-0 3 * * * certbot renew --quiet && docker-compose restart nginx
+0 3 * * * certbot renew --quiet && docker compose restart nginx
 ```

@@ -11,7 +11,7 @@ The `.conf` files in this directory are **not tracked by git** because they cont
 1. Copy the example configurations from the documentation
 2. Modify the `server_name` directives to match your domains
 3. Adjust proxy settings as needed
-4. Restart Nginx: `docker-compose restart nginx`
+4. Restart Nginx: `docker compose restart nginx`
 
 ## Services Configuration
 

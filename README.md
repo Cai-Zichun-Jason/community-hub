@@ -44,8 +44,8 @@ Integrated forum, portal, wiki, object storage, proxy management, and more
 | **BBS-GO** | 功能完整的社区论坛<br/>Full-featured forum | 8082 | bbs.local |
 | **BookStack** | 知识库和文档系统<br/>Wiki & documentation | 8083 | blog.local |
 | **MinIO** | S3 兼容对象存储<br/>S3-compatible object storage | 9001/9022 | minio.local |
-| **MetaCubeX** | 代理管理界面<br/>Proxy management UI | 9002 | vpn.local |
-| **Mihomo** | 代理核心服务<br/>Proxy core service | 9023 | proxy.local |
+| **MetaCubeX** | 代理管理界面<br/>Proxy management UI | 9002 | clash.local |
+| **Mihomo** | 代理核心服务<br/>Proxy core service | 9023 | vpn.local |
 | **MySQL** | 关系型数据库<br/>Relational database | 9021 | - |
 | **mDNS** | 局域网服务发现<br/>LAN service discovery | - | - |
 
@@ -103,13 +103,13 @@ nano .env  # or vim, code, etc.
 
 ```bash
 # 启动所有服务 | Start all services
-docker-compose up -d
+docker compose up -d
 
 # 查看服务状态 | Check service status
-docker-compose ps
+docker compose ps
 
 # 查看日志 | View logs
-docker-compose logs -f
+docker compose logs -f
 ```
 
 ### 4️⃣ 访问服务 | Access Services
@@ -123,6 +123,7 @@ docker-compose logs -f
 - 知识库 Wiki: http://localhost:8083
 - MinIO 控制台 Console: http://localhost:9001
 - 代理管理 Proxy UI: http://localhost:9002
+- 代理 API VPN API: http://localhost:9090
 
 #### 方式二：域名访问（需配置 hosts）| Method 2: Domain Access (requires hosts config)
 
@@ -155,7 +156,7 @@ docker-compose logs -f
 
 ```
 community-hub/
-├── docker-compose.yml          # Docker 编排配置 | Docker orchestration
+├── docker compose.yml          # Docker 编排配置 | Docker orchestration
 ├── .env                        # 环境变量（需从 .env.example 复制）| Environment variables
 ├── .env.example                # 环境变量示例 | Example env file
 ├── .gitignore                  # Git 忽略配置 | Git ignore rules
@@ -202,26 +203,26 @@ community-hub/
 
 ```bash
 # 启动所有服务 | Start all services
-docker-compose up -d
+docker compose up -d
 
 # 停止所有服务 | Stop all services
-docker-compose down
+docker compose down
 
 # 重启所有服务 | Restart all services
-docker-compose restart
+docker compose restart
 
 # 重启单个服务 | Restart a specific service
-docker-compose restart nginx
+docker compose restart nginx
 
 # 查看服务状态 | Check service status
-docker-compose ps
+docker compose ps
 
 # 查看服务日志 | View service logs
-docker-compose logs -f [service_name]
+docker compose logs -f [service_name]
 
 # 查看特定服务日志 | View specific service logs
-docker-compose logs -f homarr
-docker-compose logs -f bbsgo
+docker compose logs -f homarr
+docker compose logs -f bbsgo
 ```
 
 ### 数据管理 | Data Management
@@ -232,24 +233,24 @@ tar -czf backup-$(date +%Y%m%d).tar.gz \
   mysql/data minio/data bbs/uploads homarr bookstack
 
 # 恢复数据 | Restore data
-docker-compose down
+docker compose down
 tar -xzf backup-20251204.tar.gz
-docker-compose up -d
+docker compose up -d
 
 # 清理所有数据（危险操作！）| Clean all data (DANGEROUS!)
-docker-compose down -v
+docker compose down -v
 sudo rm -rf mysql/data/* minio/data/* bbs/uploads/*
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 镜像管理 | Image Management
 
 ```bash
 # 拉取最新镜像 | Pull latest images
-docker-compose pull
+docker compose pull
 
 # 重新构建并启动 | Rebuild and restart
-docker-compose up -d --build
+docker compose up -d --build
 
 # 清理未使用的镜像 | Clean unused images
 docker image prune -a
@@ -321,13 +322,13 @@ crontab -e
 
 ```bash
 # 拉取最新镜像 | Pull latest images
-docker-compose pull
+docker compose pull
 
 # 重启服务应用更新 | Restart to apply updates
-docker-compose up -d
+docker compose up -d
 
 # 检查更新后的状态 | Check status after update
-docker-compose ps
+docker compose ps
 ```
 
 ---
@@ -338,14 +339,14 @@ docker-compose ps
 
 ```bash
 # 查看详细日志 | View detailed logs
-docker-compose logs [service_name]
+docker compose logs [service_name]
 
 # 检查端口占用 | Check port usage
 sudo netstat -tunlp | grep -E "80|443|8081|8082|8083|9001"
 
 # 重新创建容器 | Recreate containers
-docker-compose down
-docker-compose up -d --force-recreate
+docker compose down
+docker compose up -d --force-recreate
 ```
 
 ### 无法访问服务 | Cannot Access Services
@@ -354,7 +355,7 @@ docker-compose up -d --force-recreate
 
 1. 服务是否正常运行 | Check if services are running:
    ```bash
-   docker-compose ps
+   docker compose ps
    ```
 
 2. 防火墙是否开放端口 | Check if firewall allows ports:
@@ -364,22 +365,22 @@ docker-compose up -d --force-recreate
 
 3. 端口映射是否正确 | Check port mappings:
    ```bash
-   docker-compose port homarr 7575
+   docker compose port homarr 7575
    ```
 
 4. 查看 Nginx 日志 | Check Nginx logs:
    ```bash
-   docker-compose logs nginx
+   docker compose logs nginx
    ```
 
 ### 数据库连接失败 | Database Connection Failure
 
 ```bash
 # 检查 MySQL 容器状态 | Check MySQL container status
-docker-compose ps mysql
+docker compose ps mysql
 
 # 查看 MySQL 日志 | View MySQL logs
-docker-compose logs mysql
+docker compose logs mysql
 
 # 测试数据库连接 | Test database connection
 docker exec -it community-mysql mysql -uroot -p
@@ -396,9 +397,9 @@ sudo chown -R $USER:$USER mysql/ minio/ bbs/ homarr/ bookstack/
 sudo chmod -R 755 mysql/ minio/ bbs/ homarr/ bookstack/
 
 # 如果使用 Docker rootless 模式 | If using Docker rootless mode
-docker-compose down
+docker compose down
 sudo chown -R $(id -u):$(id -g) mysql/ minio/ bbs/ homarr/ bookstack/
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 磁盘空间不足 | Disk Space Issues
