@@ -1,0 +1,85 @@
+# Mihomo (Clash Meta) 配置示例
+# 文档: https://wiki.metacubex.one/
+
+# HTTP(S) 和 SOCKS5 混合端口
+mixed-port: 7890
+
+# RESTful API 端口
+external-controller: 0.0.0.0:9090
+
+# API 密钥（建议修改）
+secret: "your_api_secret_here"
+
+# 允许局域网连接
+allow-lan: true
+
+# 运行模式：rule / global / direct
+mode: rule
+
+# 日志级别：silent / error / warning / info / debug
+log-level: info
+
+# IPv6 支持
+ipv6: true
+
+# DNS 配置
+dns:
+  enable: true
+  listen: 0.0.0.0:53
+  ipv6: false
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+  fallback:
+    - https://1.1.1.1/dns-query
+    - https://dns.google/dns-query
+
+# 代理节点
+proxies:
+  - name: "示例节点"
+    type: ss
+    server: server.example.com
+    port: 8388
+    cipher: aes-256-gcm
+    password: "your_password"
+
+# 代理组
+proxy-groups:
+  - name: "PROXY"
+    type: select
+    proxies:
+      - "示例节点"
+      - "DIRECT"
+
+  - name: "AutoSelect"
+    type: url-test
+    proxies:
+      - "示例节点"
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 300
+
+# 规则
+rules:
+  # 局域网直连
+  - DOMAIN-SUFFIX,local,DIRECT
+  - IP-CIDR,127.0.0.0/8,DIRECT
+  - IP-CIDR,172.16.0.0/12,DIRECT
+  - IP-CIDR,192.168.0.0/16,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT
+
+  # 常见代理
+  - DOMAIN-KEYWORD,google,PROXY
+  - DOMAIN-KEYWORD,github,PROXY
+  - DOMAIN-SUFFIX,youtube.com,PROXY
+  - DOMAIN-SUFFIX,twitter.com,PROXY
+
+  # 国内直连
+  - GEOIP,CN,DIRECT
+
+  # 默认代理
+  - MATCH,PROXY

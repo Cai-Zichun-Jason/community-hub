@@ -1,0 +1,32 @@
+baseURL: /
+port: 8082
+ipDataPath: ""
+allowedOrigins:
+- '*'
+installed: false
+logger:
+  filename: /data/logs/bbs-go.log
+  maxSize: 100
+  maxAge: 10
+  maxBackups: 10
+db:
+  url: bbsgo:your_password@tcp(mysql:3306)/bbsgo_db?charset=utf8mb4&parseTime=True&multiStatements=true&loc=Local
+  maxIdleConns: 50
+  maxOpenConns: 200
+  connMaxIdleTimeSeconds: 0
+  connMaxLifetimeSeconds: 0
+smtp:
+  host: ""
+  port: ""
+  username: ""
+  password: ""
+  ssl: true
+search:
+  indexPath: ""
+baiduSEO:
+  site: ""
+  token: ""
+smSEO:
+  site: ""
+  userName: ""
+  token: ""

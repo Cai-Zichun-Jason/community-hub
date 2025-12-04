@@ -1,32 +1,182 @@
+# ===================================
+# Community Hub Docker Compose 配置
+# ===================================
+
 services:
+  # ===================================
+  # 网络层 (Network Layer)
+  # ===================================
+
+  nginx:
+    container_name: community-nginx
+    image: nginx:alpine
+    depends_on:
+      - bbsgo
+      - homarr
+      - bookstack
+      - clash
+      - mihomo
+      - minio
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+    restart: always
+    networks:
+      - community-net
+
+  mdns:
+    container_name: community-mdns
+    image: ydkn/avahi:latest
+    network_mode: host
+    environment:
+      - AVAHI_HOSTNAME=community-hub
+    restart: always
+
+  # ===================================
+  # 存储层 (Storage Layer)
+  # ===================================
+
   mysql:
-    container_name: bbs-go-mysql
-    image: 'mysql:8.0'
+    container_name: community-mysql
+    image: mysql:8.0
     environment:
       TZ: Asia/Shanghai
-      MYSQL_DATABASE: bbsgo_db
-      MYSQL_USER: bbsgo
-      MYSQL_PASSWORD: 123456
-      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      GLOBAL_PASSWORD: ${GLOBAL_PASSWORD}
+      # BBS-GO 数据库
+      MYSQL_DATABASE: ${MYSQL_BBSGO_DATABASE}
+      MYSQL_USER: ${MYSQL_BBSGO_USER}
+      MYSQL_PASSWORD: ${MYSQL_BBSGO_PASSWORD}
     volumes:
-      - .docker-compose/mysql/data:/var/lib/mysql # 挂载数据件目录；如果非root账号执行，挂载目录必须是登录账号下目录
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    ports:
+      - "${MYSQL_PORT}:3306"
     restart: always
     healthcheck:
-      test: '/usr/bin/mysql --user=bbsgo --password=123456 bbsgo_db --execute "SHOW TABLES;"'
+      test: '/usr/bin/mysql --user=${MYSQL_BBSGO_USER} --password=${MYSQL_BBSGO_PASSWORD} ${MYSQL_BBSGO_DATABASE} --execute "SHOW TABLES;"'
       interval: 3s
       timeout: 300s
       retries: 100
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - community-net
+
+  minio:
+    container_name: community-minio
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./minio/data:/data
+    ports:
+      - "${MINIO_API_PORT}:9000"
+      - "${MINIO_CONSOLE_PORT}:9001"
+    command: server /data --console-address ":9001"
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - community-net
+
+  # ===================================
+  # 服务层 (Service Layer)
+  # ===================================
 
   bbsgo:
     container_name: bbs-go
-    image: mlogclub/bbs-go:latest
+    image: mlogclub/bbs-go:4.0.3
+    depends_on:
+      mysql:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      BBSGO_ENV: prod
+    volumes:
+      - ./bbs/bbs-go.yaml:/app/bbs-go/server/bbs-go.prod.yaml
+      - ./bbs/uploads:/app/uploads
+    ports:
+      - "${BBSGO_API_PORT}:3000"
+      # 8082 API 端口仅在 Docker 网络内部使用，不对外暴露
+    restart: on-failure
+    networks:
+      - community-net
+
+  homarr:
+    container_name: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
+    depends_on:
+      - mysql
+    environment:
+      - DATABASE_URL=mysql://${MYSQL_HOMARR_USER}:${MYSQL_HOMARR_PASSWORD}@mysql:3306/${MYSQL_HOMARR_DATABASE}
+    volumes:
+      - ./homarr/configs:/app/data/configs
+      - ./homarr/icons:/app/public/icons
+      - ./homarr/data:/data
+    ports:
+      - "${HOMARR_PORT}:7575"
+    restart: unless-stopped
+    networks:
+      - community-net
+
+  bookstack:
+    container_name: bookstack
+    image: solidnerd/bookstack:master
     depends_on:
       mysql:
         condition: service_healthy
     environment:
-      BBSGO_ENV: prod
+      - TZ=Asia/Shanghai
+      - APP_KEY=base64:YnnPfihZSNCQ9jYP6dZiFpIrBer2FFhHuAhTFqX++BI=
+      - APP_URL=http://bookstack.local
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=${MYSQL_BOOKSTACK_DATABASE}
+      - DB_USERNAME=${MYSQL_BOOKSTACK_USER}
+      - DB_PASSWORD=${MYSQL_BOOKSTACK_PASSWORD}
+    volumes:
+      - ./bookstack/config:/config
     ports:
-      - 8082:8082
-      - 3000:3000
-    restart: on-failure
+      - "${BOOKSTACK_PORT}:80"
+    restart: unless-stopped
+    networks:
+      - community-net
+
+  clash:
+    container_name: clash
+    image: ghcr.io/metacubex/metacubexd:latest
+    volumes:
+      - ./clash/data:/app/data
+    ports:
+      - "${CLASH_PORT}:80"
+    restart: unless-stopped
+    networks:
+      - community-net
+
+  mihomo:
+    container_name: mihomo
+    image: metacubex/mihomo:latest
+    volumes:
+      - ./mihomo/config:/root/.config/mihomo
+    ports:
+      - "${MIHOMO_PORT}:7890"  # HTTP/SOCKS5 混合端口对外暴露
+      # 9090 API 端口仅在 Docker 网络内部使用，不对外暴露
+    restart: unless-stopped
+    networks:
+      - community-net
+
+# ===================================
+# 网络配置
+# ===================================
+networks:
+  community-net:
+    driver: bridge
